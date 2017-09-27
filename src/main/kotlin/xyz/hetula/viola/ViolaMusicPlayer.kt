@@ -25,62 +25,107 @@
 package xyz.hetula.viola
 
 import xyz.hetula.viola.backend.Player
-import xyz.hetula.viola.model.NoopPlayback
-import xyz.hetula.viola.model.Playback
-import xyz.hetula.viola.model.PlaybackMode
-import xyz.hetula.viola.model.Song
+import xyz.hetula.viola.model.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Tuomo Heino
  * @version 27.9.2017.
  */
-class ViolaMusicPlayer(private val playerImpl: Player) {
-    private var playback: Playback = NoopPlayback()
+class ViolaMusicPlayer(private val playerImpl: Player,
+                       private val executor: ExecutorService = Executors.newSingleThreadExecutor()) {
+
+    private val syncLock = Object()
+
+    private val playedSongs = PlayedSongs()
     private var playbackStartedList = ArrayList<Song>()
+    private var playback: Playback = NoopPlayback()
     private var playbackMode: PlaybackMode = PlaybackMode.NORMAL
         get
 
     private var nowPlaying: Song? = null
         get
 
-    fun setPlayback(playbackMode: PlaybackMode) {
+    fun initialize() = sync {
+        playerImpl.create()
+    }
+
+    fun destroy() = sync {
+        executor.shutdown()
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS)
+        } catch (ex: InterruptedException) {
+            ex.printStackTrace()
+        }
+        executor.shutdownNow()
+
+        playerImpl.destroy()
+    }
+
+    fun isPaused() = sync {
+        playerImpl.isPaused()
+    }
+
+    fun isPlaying() = sync {
+        nowPlaying != null && playerImpl.isPlaying()
+    }
+
+    fun setPlayback(playbackMode: PlaybackMode) = runInBackground {
         this.playbackMode = playbackMode
-        val song = nowPlaying ?: return
+        val song = nowPlaying ?: return@runInBackground
         playback = playbackMode(playbackStartedList, song)
     }
 
-    fun play(song: Song, playContext: List<Song>) {
+    fun play(song: Song, playContext: List<Song>) = runInBackground {
         playbackStartedList.clear()
         playbackStartedList.addAll(playContext)
 
         playback = playbackMode(playContext, song)
 
-        playerImpl.play(song.uri, song.localFile)
+        playInternal(song)
     }
 
-    fun next() {
-        if (playback.moveToNext()) {
-            val nowPlaying = playback()
-            this.nowPlaying = nowPlaying
-            playerImpl.play(nowPlaying.uri, nowPlaying.localFile)
+    fun next() = runInBackground {
+        if (playedSongs.moveBack()) {
+            playInternal(playedSongs(), false)
+        } else if (playback.moveToNext()) {
+            playInternal(playback())
         }
     }
 
-    fun previous() {
-        // TODO: Implement Previous system!
+    fun previous() = runInBackground {
+        if (playedSongs.isNotEmpty() && playedSongs.moveToPrevious()) {
+            playInternal(playedSongs(), false)
+        }
     }
 
-    fun pause() = playerImpl.pause()
-
-    fun resume() = playerImpl.resume()
-
-    fun isPaused() = playerImpl.isPaused()
-
-    fun isPlaying(): Boolean {
-        return nowPlaying != null && playerImpl.isPlaying()
+    fun pause() = runInBackground {
+        playerImpl.pause()
     }
 
-    fun seekTo(position: Long) = playerImpl.seekTo(position)
+    fun resume() = runInBackground {
+        playerImpl.resume()
+    }
 
+    fun seekTo(position: Long) = runInBackground {
+        playerImpl.seekTo(position)
+    }
 
+    private fun playInternal(song: Song, addToPlayed: Boolean = true) = sync {
+        this.nowPlaying = song
+        if (addToPlayed) {
+            playedSongs(song)
+        }
+        playerImpl.play(song.uri, song.localFile)
+    }
+
+    private inline fun runInBackground(crossinline execute: () -> Unit) {
+        executor.execute {
+            execute()
+        }
+    }
+
+    private inline fun <R> sync(runInSync: () -> R) = synchronized(syncLock) { runInSync() }
 }

@@ -24,10 +24,95 @@
 
 package xyz.hetula.viola
 
+import xyz.hetula.viola.backend.Player
+
 /**
  * @author Tuomo Heino
  * @version 27.9.2017.
  */
+class DummyPlayer : Player {
+    override fun create() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun destroy() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun play(uri: String, local: Boolean) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun pause() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun resume() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun stop() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun isPlaying(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun isPaused(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun queryDuration(): Long {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun queryPosition(): Long {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun seekTo(position: Long) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun setVolume(volume: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getVolume(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun isMuted(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun setMuted(muted: Boolean) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun isDeviceChangePossible(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getDevice(): Pair<String, Int> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getDevices(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun setDevice(index: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+}
+
 fun main(args: Array<String>) {
     println("Java 9!")
+    val player = ViolaMusicPlayer(DummyPlayer())
+    val isIt: Boolean = player.isPaused()
+    val playing: Boolean = player.isPlaying()
+
 }
