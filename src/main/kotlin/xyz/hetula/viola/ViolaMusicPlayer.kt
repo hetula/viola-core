@@ -72,6 +72,22 @@ class ViolaMusicPlayer(private val playerImpl: Player,
         nowPlaying != null && playerImpl.isPlaying()
     }
 
+    fun queryDuration() = sync {
+        playerImpl.queryDuration()
+    }
+
+    fun queryPosition() = sync {
+        playerImpl.queryPosition()
+    }
+
+    fun getDevice() = playerImpl.getDevice()
+
+    fun getDevices() = playerImpl.getDevices()
+
+    fun getVolume() = sync {
+        playerImpl.getVolume()
+    }
+
     fun setPlayback(playbackMode: PlaybackMode) = runInBackground {
         this.playbackMode = playbackMode
         val song = nowPlaying ?: return@runInBackground
@@ -113,6 +129,18 @@ class ViolaMusicPlayer(private val playerImpl: Player,
         playerImpl.seekTo(position)
     }
 
+    fun setVolume(volume: Int) = runInBackground {
+        playerImpl.setVolume(volume)
+    }
+
+    fun setMuted(muted: Boolean) = runInBackground {
+        playerImpl.setMuted(muted)
+    }
+
+    fun setDevice(deviceIndex: Int) = runInBackground {
+        playerImpl.setDevice(deviceIndex)
+    }
+
     private fun playInternal(song: Song, addToPlayed: Boolean = true) = sync {
         this.nowPlaying = song
         if (addToPlayed) {
@@ -121,11 +149,7 @@ class ViolaMusicPlayer(private val playerImpl: Player,
         playerImpl.play(song.uri, song.localFile)
     }
 
-    private inline fun runInBackground(crossinline execute: () -> Unit) {
-        executor.execute {
-            execute()
-        }
-    }
+    private inline fun runInBackground(crossinline execute: () -> Unit) = executor.execute { execute() }
 
     private inline fun <R> sync(runInSync: () -> R) = synchronized(syncLock) { runInSync() }
 }
