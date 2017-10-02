@@ -22,39 +22,21 @@
  * SOFTWARE.
  */
 
-package xyz.hetula.viola.model
+package xyz.hetula.viola
 
-import xyz.hetula.viola.ViolaMusicLibrary
+import xyz.hetula.viola.model.Song
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @author Tuomo Heino
- * @version 27.9.2017.
+ * @version 2.10.2017.
  */
-class Playlist(val id: String, val name: String) {
-    private val songIds = HashMap<String, Int>()
+abstract class BaseTest {
+    private val idGen = AtomicInteger(0)
 
-    fun addSong(song: Song) {
-        songIds.computeIfAbsent(song.id) { songIds.size }
-    }
-
-    fun removeSong(song: Song) = songIds.remove(song.id) != null
-
-    fun hasSong(song: Song) = hasSong(song.id)
-
-    fun hasSong(id: String) = songIds.containsKey(id)
-
-    fun songs(library: ViolaMusicLibrary): Array<Song> {
-        if (songIds.isEmpty()) {
-            return emptyArray()
-        }
-        val songs = songIds.mapNotNull { (songId, _) -> library[songId] }.toList()
-        if (songs.isEmpty()) {
-            return emptyArray()
-        }
-        val songArr = arrayOfNulls<Song>(songs.size)
-
-        songs.forEach { songArr[songIds[it.id]!!] = it }
-
-        return songArr.requireNoNulls()
+    fun genSong(uri: String? = null, local: Boolean = true): Song {
+        val id = idGen.incrementAndGet().toString()
+        val uriStr = uri ?: "uri[$id]"
+        return Song(id, uriStr, local, System.currentTimeMillis())
     }
 }

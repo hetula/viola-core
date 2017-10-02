@@ -24,37 +24,28 @@
 
 package xyz.hetula.viola.model
 
-import xyz.hetula.viola.ViolaMusicLibrary
+import org.junit.Assert.*
+import org.junit.Test
+import xyz.hetula.viola.BaseTest
 
 /**
  * @author Tuomo Heino
- * @version 27.9.2017.
+ * @version 2.10.2017.
  */
-class Playlist(val id: String, val name: String) {
-    private val songIds = HashMap<String, Int>()
+class PlaylistTest : BaseTest() {
+    @Test
+    fun basicPlaylist() {
+        val pl = Playlist("test", "Test")
+        assertEquals("test", pl.id)
+        assertEquals("Test", pl.name)
 
-    fun addSong(song: Song) {
-        songIds.computeIfAbsent(song.id) { songIds.size }
-    }
+        val song1 = genSong()
+        pl.addSong(song1)
+        assertTrue(pl.hasSong(song1))
 
-    fun removeSong(song: Song) = songIds.remove(song.id) != null
-
-    fun hasSong(song: Song) = hasSong(song.id)
-
-    fun hasSong(id: String) = songIds.containsKey(id)
-
-    fun songs(library: ViolaMusicLibrary): Array<Song> {
-        if (songIds.isEmpty()) {
-            return emptyArray()
-        }
-        val songs = songIds.mapNotNull { (songId, _) -> library[songId] }.toList()
-        if (songs.isEmpty()) {
-            return emptyArray()
-        }
-        val songArr = arrayOfNulls<Song>(songs.size)
-
-        songs.forEach { songArr[songIds[it.id]!!] = it }
-
-        return songArr.requireNoNulls()
+        pl.addSong(genSong())
+        assertTrue(pl.hasSong("2"))
+        assertTrue(pl.removeSong(song1))
+        assertFalse(pl.hasSong(song1))
     }
 }

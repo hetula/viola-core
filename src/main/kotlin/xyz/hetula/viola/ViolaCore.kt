@@ -99,7 +99,7 @@ class DummyPlayer : Player {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getDevices(): String {
+    override fun getDevices(): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

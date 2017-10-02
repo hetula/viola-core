@@ -42,11 +42,10 @@ class ViolaMusicPlayer(private val playerImpl: Player,
     private val playedSongs = PlayedSongs()
     private var playbackStartedList = ArrayList<Song>()
     private var playback: Playback = NoopPlayback()
-    private var playbackMode: PlaybackMode = PlaybackMode.NORMAL
-        get
-
-    private var nowPlaying: Song? = null
-        get
+    var playbackMode: PlaybackMode = PlaybackMode.NORMAL
+        private set
+    var nowPlaying: Song? = null
+        private set
 
     fun initialize() = sync {
         playerImpl.create()
@@ -94,7 +93,7 @@ class ViolaMusicPlayer(private val playerImpl: Player,
         playback = playbackMode(playbackStartedList, song)
     }
 
-    fun play(song: Song, playContext: List<Song>) = runInBackground {
+    fun play(song: Song, playContext: List<Song> = ArrayList()) = runInBackground {
         playbackStartedList.clear()
         playbackStartedList.addAll(playContext)
 

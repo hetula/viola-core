@@ -2,7 +2,7 @@ group 'xyz.hetula'
 version '1.0'
 
 buildscript {
-    ext.kotlin_version = '1.1.4-3'
+    ext.kotlin_version = '1.1.51'
 
     repositories {
         mavenCentral()
@@ -15,7 +15,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
-sourceCompatibility = 1.9
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -24,6 +24,8 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
+
 }
 
 compileKotlin {

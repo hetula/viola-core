@@ -137,7 +137,7 @@ interface Player {
      * Order of given devices should not change between calls.
      * Only exception for this is if actual devices change
      */
-    fun getDevices(): String
+    fun getDevices(): List<String>
 
     /**
      * Sets device based on getDevices indexing.
